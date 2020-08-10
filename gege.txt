@@ -1,0 +1,509 @@
+#include<stdio.h>
+#include<malloc.h>
+#include<math.h>
+#include<stdlib.h>
+#define N 10
+typedef struct LNode{
+	float coef;//系数
+	int expn;//指数
+	struct LNode *next;//后继指针
+}LNode,*LinkList;
+LinkList L[N]={NULL};
+//定义一个可以存放N个头指针的指针型数组，初值是空指针
+LinkList creat_LinkList()
+{
+	int n,i=1;
+	float a;
+	LinkList head,p,rear;
+	printf("请输入系数与指数，以（0，0）标志结束；\n");
+	printf("按指数递减输入接点,要求指数为非负整数且任意两个结点都没有相同的指数\n");
+	head=NULL;
+	do
+	{
+        printf("请输入第%d项的系数与指数:",i);
+		scanf("%f,%d",&a,&n);
+		if(a!=0)
+		{
+		   p=(LinkList)malloc(sizeof(struct LNode));//建立新结点以接收数据
+           p->coef=a;
+		   p->expn=n;
+		   if(head==NULL) head=p;
+		   else rear->next=p;
+		   rear=p;
+		   i++;
+		}
+	}while(a);
+	if(rear!=NULL)
+	      rear->next=NULL;
+	printf("\n建表结束\n");
+	return (head);
+}//creatLinkList
+
+void printf_LinkList(LinkList head)
+{
+	LinkList p;
+	p=head;
+	if(p==NULL) printf("error\n");
+	while(p)
+	{
+	if(p->expn!=0)
+   {
+    if(p->coef>0)
+	  {
+	     if(p==head) printf("%.3fx^%d",p->coef,p->expn);
+		 else printf("+%.3fx^%d",p->coef,p->expn);	  
+	  }
+    else if(p->coef<0) 
+	printf("%.3fx^%d",p->coef,p->expn);
+    else 
+    {p=p->next;
+    continue;
+	}
+   }
+   else 
+   {
+   	if(p->coef>0&&p!=head)
+   	printf("+%.3f",p->coef);
+   	else if(p->coef==0)
+   	{p=p->next;continue;
+	   }
+   	else printf("%.3f",p->coef);
+   }
+   p=p->next;
+}
+   	printf("\n");
+}
+
+LinkList destroy_LinkList(LinkList head)
+{
+	LinkList p;
+	p=head;
+	if(p==NULL) printf("error\n");
+	while(p)
+	{
+		p=p->next;
+		free(p);
+	}
+	head=NULL;
+	return head;
+}
+
+LinkList clear_LinkList(LinkList head){
+	LinkList p;
+	p=head;
+	while(p){
+		p->coef=0;p->expn=0;p=p->next;
+	}
+	return head;
+}
+
+LinkList copy_LinkList(LinkList L1)
+{
+		LinkList p,q,head,rear;
+		q=L1;
+		head=NULL;
+		while(q)
+		{
+			p=(LinkList)malloc(sizeof(struct LNode));
+			p->coef=q->coef;
+			p->expn=q->expn;
+			if(head==NULL) head=p;
+			else rear->next=q;
+			q=q->next;
+			rear=p;
+		}
+		p->next=NULL;
+		return head;
+}
+
+LinkList plus_LinkList(LinkList L1,LinkList L2)
+{
+		LinkList s,pa,pb,pc;	
+		float m;
+		pa=L1;
+		pb=L2;
+		pc=NULL;
+		while(pa!=NULL&&pb!=NULL)
+		{
+		    if(pa->expn>pb->expn)
+		    {
+		    	s=(LinkList)malloc(sizeof(struct LNode));
+				s->coef=pa->coef;
+                s->expn=pa->expn;
+                s->next=NULL;
+                s->next=pc;
+				pc=s;
+				pa=pa->next; 
+			}
+			else if(pa->expn<pb->expn)
+		             {
+		    	          s=(LinkList)malloc(sizeof(struct LNode));
+				          s->coef=pb->coef;
+                          s->expn=pb->expn;
+                          s->next=pc;
+				          pc=s;
+                          pb=pb->next;
+			         }
+                else
+                    {
+				        m=pa->coef+pb->coef;
+				        s=(LinkList)malloc(sizeof(struct LNode));
+				        s->coef=m;
+                        s->expn=pa->expn;
+                        s->next=pc;
+				        pc=s;
+                        pa=pa->next;pb=pb->next;
+                    }
+		}
+        while(pa!=NULL)
+			{
+				s=(LinkList)malloc(sizeof(struct LNode));
+			    s->coef=pa->coef;
+			    s->expn=pa->expn;
+			   s->next=pc;
+				pc=s;
+			    pa=pa->next;
+			}
+		while(pb!=NULL)
+			{
+				s=(LinkList)malloc(sizeof(struct LNode));
+			    s->coef=-pb->coef;
+			    s->expn=pb->expn;
+			    s->next=pc;
+				pc=s;
+			    pb=pb->next;
+			}
+	return(pc);
+}
+
+LinkList minus_LinkList(LinkList L1,LinkList L2)//L1-L2
+{
+	    LinkList s,p,pa,pb,pc;
+		float n;
+		pc=NULL;
+		pa=L1;pb=L2;
+		while(pa&&pb)
+		{   if(pa->expn>pb->expn)
+		    {
+		    	s=(LinkList)malloc(sizeof(struct LNode));
+				s->coef=pa->coef;
+                s->expn=pa->expn;
+                s->next=pc;
+				pc=s;
+                pa=pa->next;
+			}
+			else if(pa->expn<pb->expn)
+		          {
+		    	    s=(LinkList)malloc(sizeof(struct LNode));
+				    s->coef=-pb->coef;
+                    s->expn=pb->expn;
+                    s->next=pc;
+				    pc=s;
+                    pb=pb->next;
+			      }
+                else
+			    {
+				  n=(pa->coef)-(pb->coef);
+				  s=(LinkList)malloc(sizeof(struct LNode));
+				  s->coef=n;
+                  s->expn=pa->expn;
+                  s->next=pc;
+				   pc=s;
+                  pa=pa->next;pb=pb->next;
+                  //printf("%,");
+			    }
+		}
+		while(pa!=NULL)
+			{
+				s=(LinkList)malloc(sizeof(struct LNode));
+			    s->coef=pa->coef;
+			    s->expn=pa->expn;
+			   s->next=pc;
+				pc=s;
+			    pa=pa->next;
+			}
+		while(pb!=NULL)
+			{
+				s=(LinkList)malloc(sizeof(struct LNode));
+			    s->coef=-pb->coef;
+			    s->expn=pb->expn;
+			    s->next=pc;
+				pc=s;
+			    pb=pb->next;
+			}
+		return(pc);
+}
+
+LinkList multiply_LinkList(LinkList L1,LinkList L2)
+{
+	LinkList pa,pb,pc,p,s;
+	int i,max,min,a,b,m;
+	float M[100]={0};
+	pa=L1->next;pb=L2->next;
+	max=pa->expn+pb->expn;
+	while(pa)
+	{
+	    while(pb)
+	    {
+	        m=pa->expn+pb->expn;
+	        M[m]+=(pa->coef)*(pb->coef);
+	        pb=pb->next;
+	    }
+	    pb=L2;
+	    pa=pa->next;
+	}
+    pc=(LinkList)malloc(sizeof(struct LNode));
+	pc->next=NULL;p=pc;
+	p->expn=0;p->coef=0;
+    for(i=max;i>=0;i--)
+	{
+		if(M[i]!=0)
+		{
+		s=(LinkList)malloc(sizeof(struct LNode));
+		s->coef=M[i];
+        s->expn=i;
+        s->next=NULL;p->next=s;p=s;
+        }
+    }
+	return(pc);
+}
+
+int lim(int x)//求整数x的累乘
+{
+	if(x==0)
+	    return 1;
+	else if(x==1)
+	    return 1;
+    else
+        return x*lim(x-1);
+}
+LinkList qiudao_LinkList(LinkList L,int n)//求n阶导数 
+{
+	LinkList pa,pc,p,s;
+	int i=0;
+	pc=(LinkList)malloc(sizeof(struct LNode));
+    pc->next=NULL;
+	pa=L->next;s=pc;
+	s->coef=0;s->expn=0;
+	while(pa&&pa->expn>=n)
+	    {
+           p=(LinkList)malloc(sizeof(struct LNode));
+           p->expn=(pa->expn-n);
+           p->coef=pa->coef*lim(pa->expn)/lim(pa->expn-n);
+	       pa=pa->next;
+	       p->next=NULL;s->next=p;s=p;
+	    }
+	return(pc);
+}
+
+double Qiuzhi_LinkList(double x,LinkList L)
+{
+	LinkList p;
+	double z=0;
+	p=L;
+	while(p)
+	{
+		z+=p->coef*pow(x,p->expn);
+		p=p->next;
+	}
+	return z;
+}
+
+LinkList yuanhanshu_LinkList(LinkList L)
+{
+	LinkList p,q,s,pc;
+	pc=(LinkList)malloc(sizeof(struct LNode));
+	pc->next=NULL;
+	q=L;s=pc;
+	s->expn=0;s->coef=0;
+	while(q)
+	{
+	    p=(LinkList)malloc(sizeof(struct LNode));
+		p->coef=q->coef/(q->expn+1);
+		p->expn=q->expn+1;
+		q=q->next;
+		p->next=NULL;s->next=p;s=p;
+	}
+	return pc;
+}
+
+double qiudingjifen_LinkList(LinkList L,double a,double b)
+{
+	double x,y;
+	LinkList p;
+	p=yuanhanshu_LinkList(L);
+	x=Qiuzhi_LinkList(a,p);
+	y=Qiuzhi_LinkList(b,p);
+	return (y-x);
+}
+
+LinkList qiucimi_LinkList(int n,LinkList L)
+{
+	int i;
+	LinkList M;
+	M=L;
+	for(i=1;i<n;i++)
+	{
+        M=multiply_LinkList(M,L);
+	}
+	return M;
+}
+
+int main(){
+	int menu,i,j,m,n;double x;
+	double a,b;
+	float W;//n为n阶导数或n次幂
+	double X;
+	LinkList M;
+	while(1){
+		printf("0---结束\n");
+        printf("1---创建多项式\n");
+        printf("2---显示多项式\n");
+        printf("3---销毁多项式\n");
+        printf("4---清空多项式\n");
+        printf("5---复制多项式\n");
+        printf("6---多项式求和\n");
+        printf("7---多项式求差\n");
+        printf("8---多项式求积\n");
+        printf("9---求n阶导数\n");
+        printf("10---求在x=a处的值\n");
+        printf("11---求在[a,b]上的定积分\n");
+        printf("12---求n次幂\n");
+		printf("请选择菜单:\n");
+		scanf("%d",&menu);
+		switch(menu){
+		      case 0:return 0;
+			  case 1:
+				  printf("请输入新建多项式的位置下标:\n");
+				  scanf("%d",&i);
+				  if(i>9) printf("error\n");
+				  L[i]=creat_LinkList();
+				  break;
+              case 2:
+				  printf("请输入要显示的多项式的位置下标:\n");
+				  scanf("%d",&i);
+				  if(i>9) printf("error\n");
+				  if(L[i]==NULL) printf("error\n");
+				  printf_LinkList(L[i]);
+				  break;
+              case 3:
+				  printf("请输入销毁多项式的位置下标:\n");
+				  scanf("%d",&i);
+				  if(i>9) printf("error\n");
+				  if(L[i]==NULL) printf("error\n");
+				  L[i]=destroy_LinkList(L[i]);
+				  break;
+              case 4:
+				  printf("请输入要清空多项式的位置下标:\n");
+				  scanf("%d",&i);
+				  if(i>9) printf("error\n");
+				  if(L[i]==NULL) printf("error\n");
+				  L[i]=clear_LinkList(L[i]);
+				  break;
+              case 5:
+				  printf("请输入被复制多项式的位置下标i及复制得到的位置下标j:\n");
+				  scanf("%d,%d",&i,&j);
+				  if(i>9||j>9) printf("error\n");
+				  if(L[i]==NULL) printf("error\n");
+				  if(L[j]!=NULL) printf("error\n");
+				  M=copy_LinkList(L[i]);
+				  printf_LinkList(M);
+				  L[j]=M;
+				  break;
+              case 6:
+                  printf("请输入要求和的两个多项式的位置下标\n");
+			      scanf("%d,%d",&i,&j);
+			      printf("请输入得到多项式的位置下标m\n");
+			      scanf("%d",&m);
+			      if(m>9) printf("error\n");
+			      if(L[m]!=NULL) printf("error\n");
+			      if(i>9||j>9) printf("error\n");
+				  if(L[i]==NULL) printf("error\n");
+				  if(L[j]==NULL) printf("error\n");
+				  M=plus_LinkList(L[i],L[j]);
+				  printf_LinkList(M);
+				  L[m]=M;
+			      break;
+              case 7:
+			      printf("请输入要求差的多项式的位置下标\n");
+			      scanf("%d,%d",&i,&j);
+			      if(i>9||j>9) printf("error\n");
+                  if(L[i]==NULL) printf("error\n");
+				  if(L[j]==NULL) printf("error\n");
+			      printf("请输入得到多项式的位置下标m\n");
+			      scanf("%d",&m);
+			      if(m>9) printf("error\n");
+			      if(L[m]!=NULL) printf("error\n");
+		          M=minus_LinkList(L[i],L[j]);
+		          printf_LinkList(M);
+				  L[m]=M;
+		       	  break;
+		      case 8:
+			      printf("请输入要求积的多项式的位置下标\n");
+			      scanf("%d,%d",&i,&j);
+                  if(L[i]==NULL) printf("error\n");
+				  if(L[j]==NULL) printf("error\n");
+			      if(i>9||j>9) printf("error\n");
+			      printf("请输入得到多项式的位置下标m\n");
+			      scanf("%d",&m);
+			      if(m>9) printf("error\n");
+			      if(L[m]!=NULL) printf("error\n");
+			      M=multiply_LinkList(L[i],L[j]);
+			      printf_LinkList(M);
+				  L[m]=M;
+			      break;
+	          case 9:
+			      printf("请输入要求n阶导函数的多项式的位置下标及求导阶数n\n");
+			      scanf("%d,%d",&i,&n);
+                  if(L[i]==NULL) printf("error\n");
+			      if(i>9) printf("error\n");
+			      printf("请输入得到多项式的位置下标m\n");
+			      scanf("%d",&m);
+			      if(m>9) printf("error\n");
+			      if(L[m]!=NULL) printf("error\n");
+			      M=qiudao_LinkList(L[i],n);
+			      printf_LinkList(M);
+				  L[m]=M;
+			      break;
+		      case 10:
+	              printf("请输入要求值的多项式的位置下标\n");
+			      scanf("%d",&i);
+			      printf("请输入所要求值的x\n");
+			      scanf("%lf",&x);
+			      if(i>9) printf("error\n");
+                  if(L[i]==NULL) printf("error\n");
+			      X=Qiuzhi_LinkList(x,L[i]);
+			      printf("所求值为%lf",X);
+			      break;
+		      case 11:
+			      printf("请输入要求定积分的多项式的位置下标\n");
+			      scanf("%d",&i);
+			      if(i>9) printf("error\n");
+                  if(L[i]==NULL) printf("error\n");
+			      printf("输入端点a\n");
+			      scanf("%lf",&a);
+			      printf("输入端点b\n");
+			      scanf("%lf",&b);
+			      if(a>=b) printf("error\n");
+			      X=qiudingjifen_LinkList(L[i],a,b);
+			      printf("所求值为%lf",X);
+			      break;
+	          case 12:
+	          	  printf("请输入要求多项式的次幂数\n");
+	          	  scanf("%d",&n);
+		 	      printf("请输入要求n次幂的多项式的位置下标\n");
+			      scanf("%d",&i);
+			      if(i>9) printf("error\n");
+                  if(L[i]==NULL) printf("error\n");
+			      printf("请输入得到多项式的位置下标m\n");
+			      scanf("%d",&m);
+			      if(m>9) printf("error\n");
+                  if(L[m]!=NULL) printf("error\n");
+			      M=qiucimi_LinkList(n,L[i]);
+			      printf_LinkList(M);
+				  L[m]=M;
+			      break;
+
+		}
+	}
+}
